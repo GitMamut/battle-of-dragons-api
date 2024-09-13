@@ -1,5 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, ValidationPipe } from '@nestjs/common';
 import { AppService } from './app.service';
+import { DragonDto } from './dtos/dragon.dto';
+import { FightRequestDto } from './dtos/fight-request.dto';
+import { FightResponseDto } from './dtos/fight-response.dto';
 
 @Controller()
 export class AppController {
@@ -10,16 +13,13 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  //TODO add typing for response
   @Get('dragons')
-  getDragons() {
+  getDragons(): DragonDto[] {
     return this.appService.getDragons();
   }
 
-  //TODO add input validation with request DTO
-  //TODO add typing for response
   @Post('fight')
-  fight(@Body() input: any) {
+  fight(@Body(new ValidationPipe()) input: FightRequestDto): FightResponseDto {
     return this.appService.fight(input);
   }
 }
