@@ -3,5 +3,5 @@ export class DragonDto {
   name: string;
   strength: number;
   size: number;
-  type: string;
+  type: 'Air' | 'Fire' | 'Earth' | 'Water';
 }
