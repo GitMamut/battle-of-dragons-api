@@ -11,13 +11,7 @@ export class FightService {
   constructor(
     private readonly dragonsService: DragonsService,
     private readonly historyService: HistoryService,
-  ) {
-    this.fights.set('1', {
-      fighter1: { id: 1, health: 100 },
-      fighter2: { id: 2, health: 100 },
-      result: 'start',
-    });
-  }
+  ) {}
 
   start(fighter1Id: number, fighter2Id: number): string {
     const fightId = crypto.randomUUID();
@@ -47,13 +41,13 @@ export class FightService {
 
     //TODO add fancy calculations based on dragon attributes and previous fights
     //TODO this could use some refactoring
-    let fighter1NewHealth = Math.max(
-      0,
-      savedFight.fighter1.health - fighter2AttackStrength,
+    const fighter1NewHealth = calculateNewHealth(
+      savedFight.fighter1.health,
+      fighter2AttackStrength,
     );
-    let fighter2NewHealth = Math.max(
-      0,
-      savedFight.fighter2.health - fighter1AttackStrength,
+    const fighter2NewHealth = calculateNewHealth(
+      savedFight.fighter2.health,
+      fighter1AttackStrength,
     );
 
     let result: FightResult = 'continue';
@@ -72,8 +66,6 @@ export class FightService {
       message = `Another round?`;
     }
 
-    console.log(this.fights);
-
     this.fights.set(fightId, {
       fighter1: { id: fighter1.id, health: fighter1NewHealth },
       fighter2: { id: fighter2.id, health: fighter2NewHealth },
@@ -91,6 +83,10 @@ export class FightService {
       message,
     };
   }
+}
+
+function calculateNewHealth(currentHealth: number, attackStrength: number) {
+  return Math.max(0, currentHealth - attackStrength);
 }
 
 function calculateAttackStrength(fighter: DragonDto) {
