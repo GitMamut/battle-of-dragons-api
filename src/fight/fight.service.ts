@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { DragonsService } from 'src/dragons/dragons.service';
 import { DragonDto } from 'src/dtos/dragon.dto';
+import { HistoryService } from 'src/history/history.service';
 import { FightResult, SavedFight } from 'types/SavedFight.interface';
 
 @Injectable()
 export class FightService {
   private readonly fights = new Map<string, SavedFight>();
 
-  constructor(private readonly dragonsService: DragonsService) {
+  constructor(
+    private readonly dragonsService: DragonsService,
+    private readonly historyService: HistoryService,
+  ) {
     this.fights.set('1', {
       fighter1: { id: 1, health: 100 },
       fighter2: { id: 2, health: 100 },
@@ -75,6 +79,9 @@ export class FightService {
       fighter2: { id: fighter2.id, health: fighter2NewHealth },
       result,
     });
+
+    if (result !== 'continue')
+      this.historyService.addFightResult(fighter1.id, fighter2.id, result);
 
     return {
       fighter1: { newHealth: fighter1NewHealth, damage: fighter2.strength },

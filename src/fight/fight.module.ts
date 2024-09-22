@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { FightController } from './fight.controller';
 import { FightService } from './fight.service';
-import { DragonsService } from 'src/dragons/dragons.service';
 import { DragonsModule } from 'src/dragons/dragons.module';
+import { HistoryModule } from 'src/history/history.module';
 
 @Module({
-  imports: [DragonsModule],
-  providers: [FightService, DragonsService],
+  imports: [DragonsModule, HistoryModule],
+  providers: [FightService],
   controllers: [FightController],
 })
 export class FightModule {}
