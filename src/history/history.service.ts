@@ -35,4 +35,14 @@ export class HistoryService {
     console.log(this.ranking);
     return this.ranking;
   }
+
+  getVictoryAdvantage(fighterId: number) {
+    const fighter = this.ranking.find(
+      (fighter) => fighter.fighterId === fighterId,
+    );
+    if (!fighter) {
+      return 0;
+    }
+    return fighter.wins / (fighter.wins + fighter.losses + fighter.draws);
+  }
 }

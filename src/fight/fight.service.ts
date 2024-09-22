@@ -31,21 +31,20 @@ export class FightService {
     const fighter1 = this.dragonsService.getDragon(savedFight.fighter1.id);
     const fighter2 = this.dragonsService.getDragon(savedFight.fighter2.id);
 
-    const fighter1AttackStrength = calculateAttackStrength(fighter1);
-    const fighter2AttackStrength = calculateAttackStrength(fighter2);
+    const fighter1AttackStrength = this.calculateAttackStrength(fighter1);
+    const fighter2AttackStrength = this.calculateAttackStrength(fighter2);
 
     const smallMessages = [
       `-${fighter2AttackStrength}HP ${fighter1.name}`,
       `-${fighter1AttackStrength}HP ${fighter2.name}`,
     ].sort(() => Math.random() - 0.5);
 
-    //TODO add fancy calculations based on dragon attributes and previous fights
     //TODO this could use some refactoring
-    const fighter1NewHealth = calculateNewHealth(
+    const fighter1NewHealth = this.calculateNewHealth(
       savedFight.fighter1.health,
       fighter2AttackStrength,
     );
-    const fighter2NewHealth = calculateNewHealth(
+    const fighter2NewHealth = this.calculateNewHealth(
       savedFight.fighter2.health,
       fighter1AttackStrength,
     );
@@ -83,12 +82,16 @@ export class FightService {
       message,
     };
   }
-}
 
-function calculateNewHealth(currentHealth: number, attackStrength: number) {
-  return Math.max(0, currentHealth - attackStrength);
-}
+  calculateNewHealth(currentHealth: number, attackStrength: number) {
+    return Math.max(0, currentHealth - attackStrength);
+  }
 
-function calculateAttackStrength(fighter: DragonDto) {
-  return Math.floor((Math.random() + 0.5) * fighter.strength);
+  calculateAttackStrength(fighter: DragonDto) {
+    const victoryAdvantage =
+      this.historyService.getVictoryAdvantage(fighter.id) * 0.1;
+    return Math.floor(
+      (Math.random() + 0.5 + victoryAdvantage) * fighter.strength,
+    );
+  }
 }
