@@ -7,5 +7,6 @@ export class FightResponseDto {
   fighter1: FighterResultDto;
   fighter2: FighterResultDto;
   result: string;
+  smallMessages: string[];
   message: string;
 }
