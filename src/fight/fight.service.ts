@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import EventEmitter from 'events';
 import { DragonsService } from 'src/dragons/dragons.service';
 import { DragonDto } from 'src/dtos/dragon.dto';
 import { HistoryService } from 'src/history/history.service';
+import { FightEndedEvent } from 'types/FightEndedEvent.type';
 import { FightResult, SavedFight } from 'types/SavedFight.interface';
 
 @Injectable()
@@ -11,6 +13,7 @@ export class FightService {
   constructor(
     private readonly dragonsService: DragonsService,
     private readonly historyService: HistoryService,
+    @Inject('EVENT_EMITTER') private readonly eventEmitter: EventEmitter,
   ) {}
 
   start(fighter1Id: number, fighter2Id: number): string {
@@ -71,8 +74,14 @@ export class FightService {
       result,
     });
 
-    if (result !== 'continue')
-      this.historyService.addFightResult(fighter1.id, fighter2.id, result);
+    if (result !== 'continue') {
+      this.eventEmitter.emit('fight-ended', {
+        fighter1Id: fighter1.id,
+        fighter2Id: fighter2.id,
+        result,
+      } as FightEndedEvent);
+      // this.historyService.addFightResult(fighter1.id, fighter2.id, result);
+    }
 
     return {
       fighter1: { newHealth: fighter1NewHealth, damage: fighter2.strength },

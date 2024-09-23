@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import EventEmitter from 'events';
+import { FightEndedEvent } from 'types/FightEndedEvent.type';
 
 type FighterRanking = {
   fighterId: number;
@@ -10,6 +12,15 @@ type FighterRanking = {
 @Injectable()
 export class HistoryService {
   private ranking: FighterRanking[] = [];
+
+  constructor(
+    @Inject('EVENT_EMITTER') private readonly eventEmitter: EventEmitter,
+  ) {
+    this.eventEmitter.on('fight-ended', (data: FightEndedEvent) => {
+      console.log('fight-ended: ' + JSON.stringify(data));
+      this.addFightResult(data.fighter1Id, data.fighter2Id, data.result);
+    });
+  }
 
   addFightResult(fighter1Id: number, fighter2Id: number, result: string) {
     [fighter1Id, fighter2Id].forEach((id) => {
@@ -27,12 +38,9 @@ export class HistoryService {
       this.ranking.find((fighter) => fighter.fighterId === fighter1Id).losses++;
       this.ranking.find((fighter) => fighter.fighterId === fighter2Id).wins++;
     }
-
-    console.log(this.ranking);
   }
 
   getHistory() {
-    console.log(this.ranking);
     return this.ranking;
   }
 
